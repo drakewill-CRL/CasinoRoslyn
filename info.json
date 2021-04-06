@@ -1,0 +1,15 @@
+{
+    "name":"Casino PV8",
+    "description":"Games of chance in PV8",
+    "version":"v0.0.0",
+    "ext":".pv8",
+    "gpuChip":"PV8",
+    "cartChip":"PV8",
+    "soundChip":"PV8",
+    "buildMac":"false",
+    "buildWin":"false",
+    "buildExtras":"",
+    "runnerType":"csharp",
+    "buildLinux":"false",
+    
+}

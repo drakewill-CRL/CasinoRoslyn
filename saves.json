@@ -1,0 +1,13 @@
+{
+    
+    "GameChip":
+    {
+        "savedData":{
+            "TotalRouletteWinnings": "0",
+            "CashOnHand": "500",
+            "rngMode": "1",
+            "RNGMode": "1",
+            "deckCount": "5"
+        }
+    }
+}
