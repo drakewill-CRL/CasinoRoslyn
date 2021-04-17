@@ -37,6 +37,10 @@ namespace PixelVision8.Player
         //Easy: on a loss, 20% chance of re-rolling the results.
 
 
+        public static void Init()
+        {
+        }
+
         public static void Update(int timeDelta)
         {
             Input();
@@ -150,19 +154,22 @@ namespace PixelVision8.Player
             parentRef.DrawText(betSubtypes[BetType][BetSubType], 16 * 8, 4 * 8, DrawMode.Sprite, "large", 15);
             parentRef.DrawText(BetAmount.ToString(), 16 * 8 , 6 * 8, DrawMode.Sprite, "large", 15);
 
-            parentRef.DrawText("Last Results: ", 4 * 8 , 10 * 8, DrawMode.Sprite, "large", 15);
+            parentRef.DrawText("Last Results: ", 4 * 8 , 11 * 8, DrawMode.Sprite, "large", 15);
             if (wheelSpaces.ElementAt(lastSpinResults).Value == "B")
-                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 10 * 8, DrawMode.Sprite, "large", 4); //change color to black 
+                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 11 * 8, DrawMode.Sprite, "large", 4); //change color to black 
             else if (wheelSpaces.ElementAt(lastSpinResults).Value == "R")
-                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 10 * 8, DrawMode.Sprite, "large", 8); //change color to red
+                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 11 * 8, DrawMode.Sprite, "large", 8); //change color to red
             else //Green
-                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 10 * 8, DrawMode.Sprite, "large", 1); //change color to green
+                parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 11 * 8, DrawMode.Sprite, "large", 1); //change color to green
 
             parentRef.DrawText("Cash Change: $", 4 * 8 , 12 * 8, DrawMode.Sprite, "large", 15);
             parentRef.DrawText(CashChanged.ToString(), 18 * 8 , 12 * 8, DrawMode.Sprite, "large", 15);
 
             parentRef.DrawText("Wallet: $", 4 * 8 , 13 * 8, DrawMode.Sprite, "large", 15);
             parentRef.DrawText(gameState.CashOnHand.ToString(), 14 * 8 , 13 * 8, DrawMode.Sprite, "large", 15);
+
+            parentRef.DrawText("Press Start to Spin", 4 * 8 , 9 * 8, DrawMode.Sprite, "large", 15);
+            parentRef.DrawText("Press Select to Quit", 4 * 8 , 8 * 8, DrawMode.Sprite, "large", 15);
 
             //Draw arrows around the selected element to change
             parentRef.DrawSprite(256, 14 * 8, (2 + (cursorRow * 2) * 8) ); //left arrow
@@ -248,7 +255,7 @@ namespace PixelVision8.Player
                 case "Street":
                 case "Corner":
                 case "Trio":
-                case "Split": //NOTE: payout implement, input isn't.
+                case "Split": //NOTE: payout implement, input isn't since there's 57 of them.
                 //Same logic, different payouts.
                     var rangeStringB = betSubtypes[BetType][BetSubType];
                     var valuesB = rangeStringB.Split("-");

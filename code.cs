@@ -148,13 +148,5 @@ namespace PixelVision8.Player
 			}
     
 		}		
-
-		public void DrawBlackJack()
-		{
-		}
-
-		public void DrawRoulette()
-		{
-		}
 	}
 }

@@ -59,13 +59,18 @@ namespace PixelVision8.Player
             {
                 drawState.selectedOption = drawState.selectedOption - 1;
                 if (drawState.selectedOption < 1)
-                    drawState.selectedOption = 2;
+                    drawState.selectedOption = 3;
             }
             else if(parentRef.Button(Buttons.Down, InputState.Released))
             {
                 drawState.selectedOption = drawState.selectedOption + 1;
-                if (drawState.selectedOption > 2) 
+                if (drawState.selectedOption > 3) 
                    drawState.selectedOption = 1;
+            }
+            else if(parentRef.Button(Buttons.A, InputState.Released))
+            {
+                if (drawState.selectedOption == 3) 
+                   gameState.CashOnHand = 500;
             }
         }
 
@@ -105,6 +110,20 @@ namespace PixelVision8.Player
             parentRef.DrawText("Difficulty", 8, 30 + 8, DrawMode.Tile, "large", 5); // -- unselected option is grey
             parentRef.DrawText(name, 22, 30 + 8, DrawMode.Tile, "large", 5);
         }
+
+        if (drawState.selectedOption == 3) 
+        {
+            parentRef.DrawText("Reset Wallet (Push A)", 8, 30 + 11, DrawMode.Tile, "large", 15); // -- selected option is white
+            parentRef.DrawSprite(256, (20 * 8), 39 * 11) ; //left arrow
+            parentRef.DrawSprite(257, (28 * 8), 39 * 11) ; //Right arrow
+        }
+        else
+        {
+            parentRef.DrawText("Reset Wallet         ", 8, 30 + 11, DrawMode.Tile, "large", 5); // -- unselected option is grey
+        }
+
+
+        parentRef.DrawText("Press Select to Return", 8, 30 + 20, DrawMode.Tile, "large", 15);
 
         }
     }
