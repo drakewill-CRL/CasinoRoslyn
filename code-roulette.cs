@@ -226,33 +226,57 @@ namespace PixelVision8.Player
                         cashChange = BetAmount;
                     break;
                 case "Half":
+                case "Dozen":
+                case "Sixline":
+                //Same logic , different payouts.
                     var rangeStringH = betSubtypes[BetType][BetSubType];
                     var valuesH = rangeStringH.Split("-");
                     int lowRangeH = Int32.Parse(valuesH[0]);
                     int highRangeH = Int32.Parse(valuesH[1]);
                     if (wheelNum >= lowRangeH && wheelNum <= highRangeH)
-                        cashChange = BetAmount;
-                    break;
-                case "Dozen":
-                    var rangeStringD = betSubtypes[BetType][BetSubType];
-                    var valuesD = rangeStringD.Split("-");
-                    int lowRangeD = Int32.Parse(valuesD[0]);
-                    int highRangeD = Int32.Parse(valuesD[1]);
-                    if (wheelNum >= lowRangeD && wheelNum <= highRangeD)
-                        cashChange = BetAmount * 2;
+                    {
+                        if (BetTypeList[BetType] == "Half")
+                            cashChange = BetAmount;
+                        else if (BetTypeList[BetType] == "Dozen")
+                            cashChange = BetAmount * 2;
+                        else if (BetTypeList[BetType] == "Sixline")
+                            cashChange = BetAmount * 5;
+                    }
                     break;
                 case "Basket":
+                case "Row":
+                case "Street":
+                case "Corner":
+                case "Trio":
+                case "Split": //NOTE: payout implement, input isn't.
+                //Same logic, different payouts.
                     var rangeStringB = betSubtypes[BetType][BetSubType];
                     var valuesB = rangeStringB.Split("-");
                     int[] intValsB = valuesB.Select(v => Int32.Parse(v)).ToArray();
                     if (intValsB.Any(v => v == wheelNum))
-                        cashChange = BetAmount * 6;
+                    {
+                        if (BetTypeList[BetType] == "Basket")
+                            cashChange = BetAmount * 6;
+                        else if (BetTypeList[BetType] == "Row")
+                            cashChange = BetAmount * 17;
+                        else if (BetTypeList[BetType] == "Street")
+                            cashChange = BetAmount * 11;
+                        else if (BetTypeList[BetType] == "Trio")
+                            cashChange = BetAmount * 11;
+                        else if (BetTypeList[BetType] == "Corner")
+                            cashChange = BetAmount * 8;
+                        else if (BetTypeList[BetType] == "Split")
+                            cashChange = BetAmount * 17;
+                    }
+                    break;
+                default:
+                    cashChange = -12345; //Obviously bad number to identify we didn't set up code for this bet.
                     break;
            }
 
            if (gameState.RNGMode == 1) //easy
            {
-               if (cashChange <= 0 && r.Next(1, 100) < 20) //20% to reroll on a loss.
+               if (cashChange <= 0 && r.Next(0, 100) < 20) //20% to reroll on a loss.
                {
                     RouletteResults();
                     return;
@@ -260,7 +284,7 @@ namespace PixelVision8.Player
            }
            else if (gameState.RNGMode == 2) //hard
            {
-                if (cashChange >= 0 && r.Next(1, 100) < 20) //20% chance to reroll on a win.
+                if (cashChange >= 0 && r.Next(0, 100) < 20) //20% chance to reroll on a win.
                {
                     RouletteResults();
                     return;
@@ -316,38 +340,35 @@ namespace PixelVision8.Player
 
         public static string[] BetTypeList = new string[] {
             "Single",
-            // "Row",
-            // "Split",
-            // "Street", 
-            // "Corner",
-            // "Sixline", 
             "Parity",
             "Color",
             "Half",
             "Dozen",
             "Basket",
+            "Street",
+            "Row",
+             "Corner", 
+             "Trio",
+             "Sixline"
+            // "Split", //Split has 57 possible entries, which is not at all convenient for this interface and is intentionally being excluded for the moment.
         };
 
-        //This needs to line up with the above array by index. If I did <string, string> for the type, i wouldn't need to line up perfectly.
+        //This needs to line up with the above array by index. If I did <string, string> for the type, I could skip that..
         public static Dictionary<int, string[]> betSubtypes = new Dictionary<int, string[]>() { 
-            {0, new string[] {"00", "0", "1", "2", "3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"}},
-            //{"Row"},
-            //{"Split"},
-            //{"Street"}, 
-            //{"Corner"},
-            //{"Sixline"}, 
-            //{"Dozen"},
+            {0, new string[] {"00", "0", "1", "2", "3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"}},           
             {1, new string[] {"Odd", "Even"}}, //parity
             {2, new string[] {"Red", "Black"}}, //color
             {3, new string[] {"1-18", "19-36"}}, //half
             {4, new string[] {"1-12", "13-24", "25-36"}}, //dozen
-            {5, new string[] {"00-1-2-3"}} //Basket
+            {5, new string[] {"00-1-2-3"}}, //Basket
+            {6, new string[] {"1-2-3","4-5-6","7-8-9","10-11-12","13-14-15","16-17-18","19-20-21","22-23-24","25-26-27","28-29-30","31-32-33","34-35-36"}}, //Street
+            {7, new string[] {"00-0"}}, //Row
+            {8, new string[] {"1-2-4-5", "2-3-4-6", "4-5-7-8", "5-6-8-9", "7-8-10-11", "8-9-11-12", "10-11-13-14", "11-12-14-15", "13-14-16-17", "14-15-17-18", "16-17-19-20", "17-18-20-21", "19-20-22-23", "20-21-23-24", "22-23-25-26", "23-24-26-27", "25-26-28-29", "26-27-29-30", "28-29-31-32", "29-30-32-33", "31-32-34-35", "32-33-35-36" }}, //Corner
+            {9, new string[] {"0-1-2", "00-2-3"}}, //Trio
+            {10, new string[] {"1-6", "4-9", "7-12", "10-15", "13-18", "16-21", "19-24", "22-27", "25-30", "28-33", "31-36"}}, //Sixline.
+            //{"Split"},
 
-        };
 
-        //1 = dark green
-        //2 == darker blue
-        //Color: 3 == sky blue
-        
+        };        
     }
 }
