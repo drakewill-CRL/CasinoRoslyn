@@ -18,22 +18,18 @@ namespace PixelVision8.Player
         public static int lastSpinResults = 0; //RNG picked spot on the wheel list. load Key/Value from there.
         public static int BetType = 0;
         public static int BetSubType = 0;
-        public static int BetAmount = 0;
+        public static int BetAmount = 5; //Can't bet 0, will only do bets in increments of 5, up to 100.
+        public static int CashChanged = 0;
 
         //Localized game state for Roulette
-        public static int cursorColumn = 1; //1: bidType, 2: bidSelection, 3: bidAmount
-        public static int cursorColumnIndex = 0; //Which entry in the list do we have selected.
+        public static int cursorRow = 1; //1: bidType, 2: bidSelection, 3: bidAmount
 
         //Update Notes
         //First version doesnt need graphics too much, just text to say whats going on . Can work out draw logic later.
         //Controls: 
         //Arrows move cursor between 3 control sets (bid type, bid pick, bid amount)
-        //EX: COLOR, RED, 25 or SINGLE, 00, 500
-        //so i need a list of bid types and their options as well as the spaces on the wheel
-        //Bid Pick could be stored as a list or array with the bid type, and track those 2 by index number. Include a rollover check and reset to 0 when you change bid type
-        //(this lets other bids get implemented over time easily.)
-        //Start spins the wheel, gets the outcome, and updates cash on hand. (Also updates total income change.)
-        //Select returns to the menu screen. Should also do any needed cleanup.
+        //Start or A spins the wheel, gets the outcome, and updates cash on hand. (Also updates total income change.)
+        //Select or B returns to the menu screen. Should also do any needed cleanup.
 
         //RNG setting logic:
         //Normal: just run the RNG as ususal.
@@ -48,6 +44,10 @@ namespace PixelVision8.Player
 
         public static void Input()
         {
+            //I still have some kind of array range issue.
+            //If you move around between rows, one input visually gets 'eaten' but shifts values, then they don't fall back in line.
+            //eventually you change something and it no longer matches up with the arrays correctly and it explodes.
+            
             //Adjust these as needed to check for held buttons, or multiple buttons.
             if(parentRef.Button(Buttons.Select, InputState.Released))
             {
@@ -62,24 +62,64 @@ namespace PixelVision8.Player
             }
             else if(parentRef.Button(Buttons.Left, InputState.Released))
             {
-                
+                switch(cursorRow)
+                {
+                    case 1: //change BetType
+                    BetType -= 1;
+                        if (BetType <= -1)
+                            BetType = BetTypeList.Count() - 1;
+                        
+                        if (BetSubType >= betSubtypes[BetType].Count())
+                            BetSubType = 0;
+                        break;
+                    case 2:
+                    BetSubType -= 1;
+                        if (BetSubType <= - 1)
+                            BetSubType = betSubtypes[BetType].Count() - 1;
+                        break;
+                    case 3:
+                        BetAmount -= 5;
+                        if (BetAmount <= 0)
+                            BetAmount = 100;
+                        break;
+                }
             }
             else if (parentRef.Button(Buttons.Right, InputState.Released))
             {
-                
+                switch(cursorRow)
+                {
+                    case 1:
+                         BetType += 1;
+                        if (BetType >= BetTypeList.Count())
+                            BetType = 0;
+                        
+                        if (BetSubType >= betSubtypes[BetType].Count())
+                            BetSubType = 0;
+                        break;
+                    case 2:
+                        BetSubType += 1;
+                        if (BetSubType >= betSubtypes[BetType].Count())
+                            BetSubType = 0;
+                        break;
+                    case 3:
+                        BetAmount += 5;
+                        if (BetAmount > 100)
+                            BetAmount = 5;
+                        break;
+                }                
             }
             else if(parentRef.Button(Buttons.Up, InputState.Released))
             {
-                cursorColumn = cursorColumn - 1;
-                if (cursorColumn <= 0)
-                    cursorColumn = 3;
+                cursorRow -= 1;
+                if (cursorRow <= 0)
+                    cursorRow = 3;
                 
             }
             else if(parentRef.Button(Buttons.Down, InputState.Released))
             {
-                cursorColumn = cursorColumn + 1;
-                if (cursorColumn >= 4)
-                    cursorColumn = 1;
+                cursorRow += 1;
+                if (cursorRow >= 4)
+                    cursorRow = 1;
 
             }
             else if(parentRef.Button(Buttons.A, InputState.Released))
@@ -118,16 +158,25 @@ namespace PixelVision8.Player
             else //Green
                 parentRef.DrawText(wheelSpaces.ElementAt(lastSpinResults).Key, 18 * 8 , 10 * 8, DrawMode.Sprite, "large", 1); //change color to green
 
+            parentRef.DrawText("Cash Change: $", 4 * 8 , 12 * 8, DrawMode.Sprite, "large", 15);
+            parentRef.DrawText(CashChanged.ToString(), 18 * 8 , 12 * 8, DrawMode.Sprite, "large", 15);
+
+            parentRef.DrawText("Wallet: $", 4 * 8 , 13 * 8, DrawMode.Sprite, "large", 15);
+            parentRef.DrawText(gameState.CashOnHand.ToString(), 14 * 8 , 13 * 8, DrawMode.Sprite, "large", 15);
+
             //Draw arrows around the selected element to change
-            //if (cursorColumn == 1)
-            //{
-                parentRef.DrawSprite(256, 14 * 8, (2 + (cursorColumn * 2) * 8) ); //left arrow
-                parentRef.DrawSprite(257, 22 * 8, (2 + (cursorColumn * 2) * 8)); //right arrow
-            //}
+            parentRef.DrawSprite(256, 14 * 8, (2 + (cursorRow * 2) * 8) ); //left arrow
+            parentRef.DrawSprite(257, 30 * 8, (2 + (cursorRow * 2) * 8)); //right arrow
+
+            if (drawState.debugDisplay)
+            {
+                parentRef.DrawText("betType:" + BetType.ToString(), 4 * 8 , 27 * 8, DrawMode.Sprite, "large", 15);
+                parentRef.DrawText("betSubType:" + BetSubType.ToString(), 4 * 8 , 28 * 8, DrawMode.Sprite, "large", 15);
+            }
 
         }
 
-        public static string RouletteResults()
+        public static void RouletteResults()
         {
             /*Roulette rules:
             / The wheel has numbers 0-36, plus a 00 space (American Roulette), for a total of 37 evenly likely outcomes.
@@ -137,7 +186,9 @@ namespace PixelVision8.Player
            var winningEntry = r.Next(0, wheelSpaces.Count);
            var space = wheelSpaces.ElementAt(winningEntry);
            lastSpinResults = winningEntry;
-           return space.Key + space.Value;
+
+           RouletteBetResolve();
+           return; // space.Key + space.Value;
         }
 
         public static void RouletteBetResolve()
@@ -154,6 +205,71 @@ namespace PixelVision8.Player
             / Odd, Even, Red, Black, 1-18, 19-36: 1x bet.
             */
            //Look up their Bid Entry, see if it matches the Results, and update player info as needed
+            
+            int cashChange = -BetAmount;
+            var spinInfo = wheelSpaces.ElementAt(lastSpinResults);
+            int wheelNum = 0;
+            Int32.TryParse(spinInfo.Key, out wheelNum);
+            switch(BetTypeList[BetType]) 
+            {
+               // Work on a string here, so we can juggle order if needed.
+                case "Single":
+                    if (spinInfo.Key == betSubtypes[BetType][BetSubType])
+                        cashChange = BetAmount * 35;
+                    break;
+                case "Parity":
+                    if ((betSubtypes[BetType][BetSubType] == "Odd" && wheelNum % 2 == 1) || ((betSubtypes[BetType][BetSubType] == "Even" && wheelNum % 2 == 0)))
+                        cashChange = BetAmount;
+                    break;
+                case "Color":
+                    if ((spinInfo.Value == "R" && betSubtypes[BetType][BetSubType] == "Red") || (spinInfo.Value == "B" && betSubtypes[BetType][BetSubType] == "Black"))
+                        cashChange = BetAmount;
+                    break;
+                case "Half":
+                    var rangeStringH = betSubtypes[BetType][BetSubType];
+                    var valuesH = rangeStringH.Split("-");
+                    int lowRangeH = Int32.Parse(valuesH[0]);
+                    int highRangeH = Int32.Parse(valuesH[1]);
+                    if (wheelNum >= lowRangeH && wheelNum <= highRangeH)
+                        cashChange = BetAmount;
+                    break;
+                case "Dozen":
+                    var rangeStringD = betSubtypes[BetType][BetSubType];
+                    var valuesD = rangeStringD.Split("-");
+                    int lowRangeD = Int32.Parse(valuesD[0]);
+                    int highRangeD = Int32.Parse(valuesD[1]);
+                    if (wheelNum >= lowRangeD && wheelNum <= highRangeD)
+                        cashChange = BetAmount * 2;
+                    break;
+                case "Basket":
+                    var rangeStringB = betSubtypes[BetType][BetSubType];
+                    var valuesB = rangeStringB.Split("-");
+                    int[] intValsB = valuesB.Select(v => Int32.Parse(v)).ToArray();
+                    if (intValsB.Any(v => v == wheelNum))
+                        cashChange = BetAmount * 6;
+                    break;
+           }
+
+           if (gameState.RNGMode == 1) //easy
+           {
+               if (cashChange <= 0 && r.Next(1, 100) < 20) //20% to reroll on a loss.
+               {
+                    RouletteResults();
+                    return;
+               }
+           }
+           else if (gameState.RNGMode == 2) //hard
+           {
+                if (cashChange >= 0 && r.Next(1, 100) < 20) //20% chance to reroll on a win.
+               {
+                    RouletteResults();
+                    return;
+               }
+           }
+
+           gameState.CashOnHand += cashChange;
+           gameState.TotalRouletteWinnings += cashChange;
+           CashChanged = cashChange;
         }
 
         //Number, then color
@@ -204,27 +320,28 @@ namespace PixelVision8.Player
             // "Split",
             // "Street", 
             // "Corner",
-            // "Basket",
             // "Sixline", 
-            // "Dozen",
             "Parity",
             "Color",
-            "Half"
+            "Half",
+            "Dozen",
+            "Basket",
         };
 
-        //This needs to line up with the above array.
+        //This needs to line up with the above array by index. If I did <string, string> for the type, i wouldn't need to line up perfectly.
         public static Dictionary<int, string[]> betSubtypes = new Dictionary<int, string[]>() { 
             {0, new string[] {"00", "0", "1", "2", "3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"}},
             //{"Row"},
             //{"Split"},
             //{"Street"}, 
             //{"Corner"},
-            //{"Basket"},
             //{"Sixline"}, 
             //{"Dozen"},
-            {1, new string[] {"Odd", "Even"}},
-            {2, new string[] {"Red", "Black"}}, //red-black, 
-            {3, new string[] {"1-18", "19-36"}} //1-18, 19-36
+            {1, new string[] {"Odd", "Even"}}, //parity
+            {2, new string[] {"Red", "Black"}}, //color
+            {3, new string[] {"1-18", "19-36"}}, //half
+            {4, new string[] {"1-12", "13-24", "25-36"}}, //dozen
+            {5, new string[] {"00-1-2-3"}} //Basket
 
         };
 
