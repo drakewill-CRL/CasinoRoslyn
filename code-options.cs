@@ -83,9 +83,9 @@ namespace PixelVision8.Player
             if (drawState.selectedOption == 1)
             {
                 parentRef.DrawText("Deck Count", 8, 30 +5, DrawMode.Tile, "large", 15); // -- selected option is white
-                parentRef.DrawSprite(256, (20 * 8), 36 * 8); // --left arrow
+                parentRef.DrawSprite(43, (20 * 8), 36 * 8); // --left arrow
                 parentRef.DrawText(gameState.deckCount.ToString(), 22, 30 + 5, DrawMode.Tile, "large", 15);
-                parentRef.DrawSprite(257, (24 * 8), 36 * 8); //Right arrow
+                parentRef.DrawSprite(44, (24 * 8), 36 * 8); //Right arrow
             }
             else
                 parentRef.DrawText("Deck Count", 8, 30 + 5, DrawMode.Tile, "large", 5); // unselected option is grey
@@ -101,9 +101,9 @@ namespace PixelVision8.Player
         if (drawState.selectedOption == 2) 
         {
             parentRef.DrawText("Difficulty", 8, 30 + 8, DrawMode.Tile, "large", 15); // -- selected option is white
-            parentRef.DrawSprite(256, (20 * 8), 39 * 8) ; //left arrow
+            parentRef.DrawSprite(43, (20 * 8), 39 * 8) ; //left arrow
             parentRef.DrawText(name, 22, 30 + 8, DrawMode.Tile, "large", 15);
-            parentRef.DrawSprite(257, (28 * 8), 39 * 8) ; //Right arrow
+            parentRef.DrawSprite(44, (28 * 8), 39 * 8) ; //Right arrow
         }
         else
         {
@@ -114,8 +114,8 @@ namespace PixelVision8.Player
         if (drawState.selectedOption == 3) 
         {
             parentRef.DrawText("Reset Wallet (Push A)", 8, 30 + 11, DrawMode.Tile, "large", 15); // -- selected option is white
-            parentRef.DrawSprite(256, (20 * 8), 39 * 11) ; //left arrow
-            parentRef.DrawSprite(257, (28 * 8), 39 * 11) ; //Right arrow
+            parentRef.DrawSprite(43, (20 * 8), 39 * 11) ; //left arrow
+            parentRef.DrawSprite(44, (28 * 8), 39 * 11) ; //Right arrow
         }
         else
         {

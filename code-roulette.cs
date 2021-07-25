@@ -172,8 +172,8 @@ namespace PixelVision8.Player
             parentRef.DrawText("Press Select to Quit", 4 * 8 , 8 * 8, DrawMode.Sprite, "large", 15);
 
             //Draw arrows around the selected element to change
-            parentRef.DrawSprite(256, 14 * 8, (2 + (cursorRow * 2) * 8) ); //left arrow
-            parentRef.DrawSprite(257, 30 * 8, (2 + (cursorRow * 2) * 8)); //right arrow
+            parentRef.DrawSprite(43, 14 * 8, (2 + (cursorRow * 2) * 8) ); //left arrow
+            parentRef.DrawSprite(44, 30 * 8, (2 + (cursorRow * 2) * 8)); //right arrow
 
             if (drawState.debugDisplay)
             {

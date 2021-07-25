@@ -125,20 +125,20 @@ namespace PixelVision8.Player
     		DrawText("Select A Game", 12, 12, DrawMode.Tile, "large", 15);
     		if (drawState.gameToPick == 1) 
 			{
-      			DrawSprite(256, 56, 110); //left arrow
+      			DrawSprite(43, 56, 110); //left arrow
       			DrawText("Options    ", 8, 14, DrawMode.Tile, "large", 15);
-      			DrawSprite(257, 200, 110); //right arrow
+      			DrawSprite(44, 200, 110); //right arrow
 			}
     		else if (drawState.gameToPick == 2) 
 			{
-      			DrawSprite(256, 56, 110); //left arrow
+      			DrawSprite(43, 56, 110); //left arrow
       			DrawText("BlackJack    ", 8, 14, DrawMode.Tile, "large", 15);
-      			DrawSprite(257, 200, 110);  //right arrow
+      			DrawSprite(44, 200, 110);  //right arrow
 			}
     		else if (drawState.gameToPick == 3) {
-      			DrawSprite(256, 56, 110); //left arrow
+      			DrawSprite(43, 56, 110); //left arrow
       			DrawText("Roulette    ", 8, 14, DrawMode.Tile, "large", 15);
-      			DrawSprite(257, 200, 110);//right arrow
+      			DrawSprite(44, 200, 110);//right arrow
 			}
     
     		if (drawState.debugDisplay) {
